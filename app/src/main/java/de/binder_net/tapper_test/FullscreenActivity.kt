@@ -25,10 +25,7 @@ constructor() : AppCompatActivity() {
         mContentView.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
 
-                val text = String.format(Locale.ENGLISH, "X: %f | Y: %f", event.x, event.y)
-                val duration = Toast.LENGTH_SHORT
-
-                Toast.makeText(applicationContext, text, duration).show()
+                log("X: ${event.x} | Y: ${event.y}")
             }
 
             true
@@ -54,14 +51,14 @@ constructor() : AppCompatActivity() {
                     val x = rand.nextFloat() * (maxX - minX) + minX
                     val y = rand.nextFloat() * (maxY - minY) + minY
 
-                    val cmd = String.format(Locale.ENGLISH, "/system/bin/input tap %f %f\n", x, y)
+                    val cmd = "/system/bin/input tap $x $y\n"
                     os.writeBytes(cmd)
                     os.writeBytes("exit\n")
                     os.flush()
                     os.close()
                     process.waitFor()
 
-                    Log.d("My-Tag", cmd)
+                    log(cmd)
                 } catch (e: IOException) {
                     e.printStackTrace()
                 } catch (e: InterruptedException) {
@@ -70,10 +67,13 @@ constructor() : AppCompatActivity() {
 
                 val endTime = System.currentTimeMillis()
                 val totalTime = endTime - startTime
-                Log.d("My-Tag", String.format(Locale.ENGLISH, "Delta: %d", totalTime))
+                log("Delta: $totalTime")
             }
         }, 1000, 5000)
     }
 
+    fun log(message: String) {
 
+        Log.d("FullscreenActivity", message)
+    }
 }
