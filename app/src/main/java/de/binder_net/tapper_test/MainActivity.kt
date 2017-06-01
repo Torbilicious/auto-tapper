@@ -3,7 +3,6 @@ package de.binder_net.tapper_test
 import android.annotation.SuppressLint
 import android.graphics.RectF
 import android.os.Bundle
-import android.os.SystemClock
 import android.support.v7.app.AppCompatActivity
 import android.util.DisplayMetrics
 import android.util.Log
