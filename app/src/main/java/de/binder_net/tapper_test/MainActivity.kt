@@ -3,6 +3,7 @@ package de.binder_net.tapper_test
 import android.annotation.SuppressLint
 import android.graphics.RectF
 import android.os.Bundle
+import android.os.SystemClock
 import android.support.v7.app.AppCompatActivity
 import android.util.DisplayMetrics
 import android.util.Log
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeoutException
 class MainActivity : AppCompatActivity() {
     var running: Boolean = false
     var rootAvailable: Boolean = false
+    val time: TimeProfiler = TimeProfiler()
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,32 +51,46 @@ class MainActivity : AppCompatActivity() {
             if (event.action == MotionEvent.ACTION_DOWN) {
 
                 log("X: ${event.x} | Y: ${event.y}")
+
+                log("Delta: ${time.end()}")
             }
 
             true
         }
 
         Timer().scheduleAtFixedRate(object : TimerTask() {
+
+            var screen: RectF = RectF()
+            var minX: Float = 0f
+            var maxX: Float = 0f
+            var minY: Float = 0f
+            var maxY: Float = 0f
+            var rand = Random()
+            var x: Float = 0f
+            var y: Float = 0f
+
             override fun run() {
 
                 if (!running || !rootAvailable)
                     return
 
-                val screen: RectF = getViewDimensions(mContentView)
+                time.start()
 
-                val minX: Float = screen.left
-                val maxX: Float = screen.right
-                val minY: Float = screen.top
-                val maxY: Float = screen.bottom
+                screen = getViewDimensions(mContentView)
 
-                val rand = Random()
+                minX = screen.left
+                maxX = screen.right
+                minY = screen.top
+                maxY = screen.bottom
 
-                val x = rand.nextFloat() * (maxX - minX) + minX
-                val y = rand.nextFloat() * (maxY - minY) + minY
+                rand = Random()
+
+                x = rand.nextFloat() * (maxX - minX) + minX
+                y = rand.nextFloat() * (maxY - minY) + minY
 
                 rootRun("/system/bin/input tap $x $y\n")
             }
-        }, 1000, 5000)
+        }, 1000, 2500)
     }
 
     override fun onPause() {
@@ -91,7 +107,7 @@ class MainActivity : AppCompatActivity() {
 
     fun log(message: String) {
 
-        Log.d("FullscreenActivity", message)
+        Log.d("MainActivity", message)
     }
 
     fun rootRun(vararg commands: String) {
